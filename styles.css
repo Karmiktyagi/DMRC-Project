@@ -1,0 +1,396 @@
+/* ==================================================================
+   DESIGN TOKENS
+   Everything visual traces back to these variables. Change a value
+   here and it propagates across the whole wizard.
+================================================================== */
+:root {
+  /* Color: cool, confident blue as primary (nods to the metro/rail
+     identity without being a literal government-portal navy),
+     a warm amber for caution/waitlist states, teal for verified/
+     success, and a soft cool-gray canvas so white cards pop gently
+     instead of glaring. */
+  --color-bg: #F3F5F9;
+  --color-surface: #FFFFFF;
+  --color-primary: #2952E3;
+  --color-primary-dark: #1E3FBF;
+  --color-primary-soft: #EAEFFD;
+  --color-teal: #0EA5A0;
+  --color-teal-soft: #E3F7F6;
+  --color-amber: #B45309;
+  --color-amber-soft: #FFF3DE;
+  --color-danger: #D6423C;
+  --color-danger-soft: #FCEAE9;
+  --color-text: #1B2233;
+  --color-text-soft: #667085;
+  --color-border: #E3E7EF;
+
+  --radius-lg: 16px;
+  --radius-md: 10px;
+  --radius-sm: 6px;
+
+  --shadow-card: 0 1px 2px rgba(16, 24, 40, 0.04), 0 8px 24px -8px rgba(16, 24, 40, 0.10);
+  --shadow-stub: 0 12px 32px -12px rgba(41, 82, 227, 0.28);
+
+  --font-display: 'Sora', 'Inter', sans-serif;
+  --font-body: 'Inter', sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  background: var(--color-bg);
+  font-family: var(--font-body);
+  color: var(--color-text);
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4, .brand, .step-label strong {
+  font-family: var(--font-display);
+}
+
+/* ==================================================================
+   TOP BAR
+================================================================== */
+.topbar {
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+.topbar-inner { padding: 14px 24px; }
+
+.brand-mark {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.05rem;
+  letter-spacing: 0.02em;
+  color: var(--color-primary);
+}
+.brand-sep {
+  width: 1px; height: 18px; background: var(--color-border);
+}
+.brand-sub {
+  font-size: 0.92rem;
+  color: var(--color-text-soft);
+  font-weight: 500;
+}
+
+.employee-chip { }
+.avatar-dot {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.95rem;
+}
+.employee-name { font-size: 0.88rem; font-weight: 600; line-height: 1.15; }
+.employee-dept { font-size: 0.74rem; color: var(--color-text-soft); }
+
+/* ==================================================================
+   STEPPER
+================================================================== */
+.stepper-wrap {
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  padding: 6px 24px;
+  overflow-x: auto;
+}
+.stepper {
+  display: flex;
+  list-style: none;
+  margin: 0; padding: 0;
+  gap: 4px;
+}
+.step-item { flex: 1; min-width: 150px; }
+.step-btn {
+  width: 100%;
+  display: flex; align-items: center; gap: 10px;
+  background: none; border: none;
+  padding: 12px 10px;
+  border-radius: var(--radius-md);
+  cursor: not-allowed;
+  opacity: 0.55;
+  transition: background 0.15s ease, opacity 0.15s ease;
+  text-align: left;
+}
+/* JS toggles these two states as the referrer progresses */
+.step-item.is-reachable .step-btn { cursor: pointer; opacity: 1; }
+.step-item.is-reachable .step-btn:hover { background: var(--color-bg); }
+
+.step-index {
+  width: 28px; height: 28px; flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--color-border);
+  color: var(--color-text-soft);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.82rem; font-weight: 700;
+  font-family: var(--font-display);
+}
+.step-item.is-active .step-index { background: var(--color-primary); color: #fff; }
+.step-item.is-complete .step-index { background: var(--color-teal); color: #fff; }
+.step-item.is-complete .step-index::before { content: "\F26E"; font-family: "bootstrap-icons"; font-size: 0.85rem; }
+
+.step-label strong { display: block; font-size: 0.86rem; line-height: 1.2; }
+.step-label small { color: var(--color-text-soft); font-size: 0.74rem; }
+.step-item.is-active .step-label strong { color: var(--color-primary); }
+
+/* ==================================================================
+   MAIN LAYOUT
+================================================================== */
+.wizard-main { padding: 28px 24px 120px; }
+
+.panel-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 28px 28px 32px;
+}
+.panel-head h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.panel-head p {
+  color: var(--color-text-soft);
+  font-size: 0.9rem;
+  margin-bottom: 22px;
+}
+.subhead {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+.subhead-hint {
+  font-size: 0.76rem;
+  font-weight: 500;
+  color: var(--color-text-soft);
+  font-family: var(--font-body);
+  text-transform: none;
+}
+.section-divider { border-color: var(--color-border); margin: 26px 0; }
+
+/* Form controls: slightly larger radius + calmer focus ring than
+   Bootstrap defaults, to match the softer card language */
+.form-label { font-size: 0.84rem; font-weight: 600; color: var(--color-text); margin-bottom: 6px; }
+.req { color: var(--color-danger); margin-left: 2px; }
+.form-control, .form-select {
+  border-radius: var(--radius-sm);
+  border-color: var(--color-border);
+  padding: 0.55rem 0.75rem;
+  font-size: 0.92rem;
+}
+.form-control:focus, .form-select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(41, 82, 227, 0.14);
+}
+
+/* ==================================================================
+   FILE UPLOAD DROPZONES (Step 2)
+================================================================== */
+.dropzone {
+  position: relative;
+  border: 1.5px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.dropzone.is-dragover { border-color: var(--color-primary); background: var(--color-primary-soft); }
+.dropzone.is-valid { border-color: var(--color-teal); background: var(--color-teal-soft); }
+.dropzone.is-invalid { border-color: var(--color-danger); background: var(--color-danger-soft); }
+
+.dz-label {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 26px 14px;
+  cursor: pointer;
+  margin: 0;
+}
+.dz-icon { font-size: 1.6rem; color: var(--color-primary); margin-bottom: 8px; }
+.dropzone.is-valid .dz-icon { color: var(--color-teal); }
+.dropzone.is-invalid .dz-icon { color: var(--color-danger); }
+.dz-title { font-weight: 600; font-size: 0.9rem; }
+.dz-hint { font-size: 0.76rem; color: var(--color-text-soft); }
+
+.dz-status { padding: 0 14px 14px; font-size: 0.78rem; }
+.dz-status .filename-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: #fff; border: 1px solid var(--color-border);
+  border-radius: 999px; padding: 4px 10px;
+  font-family: 'Inter', monospace;
+  font-size: 0.72rem;
+}
+.dz-status .error-text { color: var(--color-danger); font-weight: 500; }
+
+/* ==================================================================
+   CAPACITY / WAITLIST (Step 3)
+================================================================== */
+.capacity-readout { margin-top: 8px; font-size: 0.82rem; min-height: 20px; }
+.capacity-readout .cap-ok { color: var(--color-teal); font-weight: 600; }
+.capacity-readout .cap-full { color: var(--color-amber); font-weight: 600; }
+
+.ward-switch .form-check-label { font-size: 0.86rem; }
+
+.alert-banner {
+  display: flex; align-items: flex-start; gap: 10px;
+  background: var(--color-amber-soft);
+  color: var(--color-amber);
+  border: 1px solid #F7DDAE;
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  font-size: 0.86rem;
+  margin-top: 20px;
+}
+.alert-banner i { margin-top: 2px; }
+
+/* ==================================================================
+   REVIEW SUMMARY (Step 4)
+================================================================== */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px 24px;
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+  padding: 18px;
+}
+.summary-grid .sg-item dt {
+  font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em;
+  color: var(--color-text-soft); margin-bottom: 2px;
+}
+.summary-grid .sg-item dd { font-size: 0.9rem; font-weight: 600; margin: 0; }
+
+.declaration-check {
+  background: var(--color-bg);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.declaration-check .form-check-label { font-size: 0.86rem; }
+
+/* ==================================================================
+   TICKET STUB (signature element)
+   Modeled loosely on a metro card / boarding-pass stub: a solid
+   colored header, perforated dividers, and a receipt-style body.
+================================================================== */
+.ticket-stub {
+  top: 20px;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-stub);
+}
+.ticket-top {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  color: #fff;
+  padding: 18px 20px;
+}
+.ticket-eyebrow {
+  font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em;
+  opacity: 0.85;
+}
+.ticket-code {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin-top: 4px;
+  letter-spacing: 0.02em;
+}
+
+/* Perforated divider drawn with a repeating radial-gradient "notches" */
+.ticket-perforation {
+  height: 14px;
+  background: repeating-linear-gradient(
+    to right,
+    var(--color-border) 0,
+    var(--color-border) 6px,
+    transparent 6px,
+    transparent 12px
+  );
+  background-position: center;
+  background-size: 12px 1.5px;
+  background-repeat: repeat-x;
+  position: relative;
+}
+
+.ticket-body { padding: 18px 20px 6px; }
+.ticket-fact { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.ticket-fact dt { font-size: 0.76rem; color: var(--color-text-soft); }
+.ticket-fact dd { font-size: 0.84rem; font-weight: 600; text-align: right; margin: 0; }
+
+.ticket-status { margin: 14px 0 18px; text-align: center; }
+.status-pill {
+  display: inline-block;
+  padding: 5px 16px;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.status-draft { background: var(--color-border); color: var(--color-text-soft); }
+.status-waitlist { background: var(--color-amber-soft); color: var(--color-amber); }
+.status-ready { background: var(--color-teal-soft); color: var(--color-teal); }
+.status-submitted { background: var(--color-primary-soft); color: var(--color-primary); }
+
+.ticket-footer {
+  display: flex; align-items: center; gap: 8px;
+  padding: 14px 20px 18px;
+  font-size: 0.76rem;
+  color: var(--color-text-soft);
+}
+.ticket-footer i { color: var(--color-teal); }
+
+/* ==================================================================
+   ACTION BAR
+================================================================== */
+.wizard-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+  padding: 16px 20px;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+.wizard-actions .btn { border-radius: var(--radius-sm); font-size: 0.9rem; font-weight: 600; padding: 0.55rem 1.1rem; }
+.btn-primary { background: var(--color-primary); border-color: var(--color-primary); }
+.btn-primary:hover { background: var(--color-primary-dark); border-color: var(--color-primary-dark); }
+.btn-outline-primary { color: var(--color-primary); border-color: var(--color-primary); }
+.btn-success { background: var(--color-teal); border-color: var(--color-teal); }
+
+/* ==================================================================
+   MODAL / SUCCESS STATE
+================================================================== */
+.success-check {
+  width: 56px; height: 56px; margin: 0 auto;
+  border-radius: 50%;
+  background: var(--color-teal-soft);
+  color: var(--color-teal);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem;
+}
+.final-ticket-code {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--color-primary);
+  margin-top: 4px;
+}
+
+/* ==================================================================
+   RESPONSIVE
+================================================================== */
+@media (max-width: 991.98px) {
+  .ticket-stub { position: static; margin-bottom: 4px; }
+  .summary-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 575.98px) {
+  .step-label small { display: none; }
+  .topbar-inner { padding: 12px 16px; }
+  .wizard-main { padding: 20px 12px 130px; }
+  .panel-card { padding: 20px; }
+}
+
+/* Respect reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
