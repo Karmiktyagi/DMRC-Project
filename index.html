@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DMRC Intern Referral | Application Wizard</title>
+
+<!-- ============================================================
+     FONTS
+     "Sora" = display/heading font (geometric, technical feel -
+     fits an engineering/infrastructure org without being generic).
+     "Inter" = body + data font (very legible in small form labels
+     and tables).
+============================================================= -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Bootstrap 5 (CSS) -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Bootstrap Icons - used for upload/step/status icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+<!-- Our own stylesheet - all custom design tokens & overrides live here -->
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ============================================================
+     TOP BAR
+     Simple identity bar. In production this would pull the
+     logged-in employee's name/dept from the intranet SSO token
+     (see Section 1 of the blueprint) - here it's static markup,
+     the JS layer fills in the placeholder span on load.
+============================================================= -->
+<header class="topbar">
+  <div class="topbar-inner container-xxl d-flex align-items-center justify-content-between">
+    <div class="brand d-flex align-items-center gap-2">
+      <span class="brand-mark">DMRC</span>
+      <span class="brand-sep"></span>
+      <span class="brand-sub">Intern Referral Portal</span>
+    </div>
+    <div class="employee-chip d-flex align-items-center gap-2">
+      <span class="avatar-dot"><i class="bi bi-person-fill"></i></span>
+      <div class="employee-meta">
+        <div class="employee-name" id="employeeName">R. Sharma</div>
+        <div class="employee-dept" id="employeeDept">Employee Code: EMP-4471 &middot; Signal &amp; Telecom</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ============================================================
+     STEPPER
+     Horizontal 4-step progress indicator. Each .step-item is
+     clickable only once a step has been visited/validated
+     (controlled entirely in script.js -> renderStepper()).
+============================================================= -->
+<nav class="stepper-wrap" aria-label="Application progress">
+  <div class="container-xxl">
+    <ol class="stepper" id="stepper">
+      <li class="step-item" data-step="1">
+        <button type="button" class="step-btn" data-goto="1">
+          <span class="step-index">1</span>
+          <span class="step-label">
+            <strong>Student Profile</strong>
+            <small>Personal information</small>
+          </span>
+        </button>
+      </li>
+      <li class="step-item" data-step="2">
+        <button type="button" class="step-btn" data-goto="2">
+          <span class="step-index">2</span>
+          <span class="step-label">
+            <strong>Academic details</strong>
+            <small>Academic matrix</small>
+          </span>
+        </button>
+      </li>
+      <li class="step-item" data-step="3">
+        <button type="button" class="step-btn" data-goto="3">
+          <span class="step-index">3</span>
+          <span class="step-label">
+            <strong>Documents</strong>
+            <small>Cloud uploads</small>
+          </span>
+        </button>
+      </li>
+      <li class="step-item" data-step="4">
+        <button type="button" class="step-btn" data-goto="4">
+          <span class="step-index">4</span>
+          <span class="step-label">
+            <strong>Placement</strong>
+            <small>Dept &amp; schedule</small>
+          </span>
+        </button>
+      </li>
+      <li class="step-item" data-step="5">
+        <button type="button" class="step-btn" data-goto="5">
+          <span class="step-index">5</span>
+          <span class="step-label">
+            <strong>Review &amp; Submit</strong>
+            <small>Legal declarations</small>
+          </span>
+        </button>
+      </li>
+    </ol>
+  </div>
+</nav>
+
+<!-- ============================================================
+     MAIN WIZARD AREA
+     Left column (8/12): the active step's form panel.
+     Right column (4/12): the live "ticket stub" - a persistent
+     summary card themed like a metro ticket, updating in real
+     time as the referrer fills the form. This is the page's one
+     signature visual element.
+============================================================= -->
+<main class="wizard-main">
+  <div class="container-xxl">
+    <div class="row g-4">
+
+      <!-- ---------------- LEFT: FORM PANELS ---------------- -->
+      <div class="col-lg-8">
+        <form id="wizardForm" novalidate>
+
+          <!-- ========== STEP 1: STUDENT PROFILE  ==========
+               Field set below maps 1:1 to the `students`
+                tables in Intern_Portal.sql so the
+               payload needs no reshaping once a real endpoint exists.
+               Required/optional matches each column's NOT NULL / NULL
+               constraint in the schema. -->
+          <section class="wizard-panel" id="panel-1" data-panel="1">
+            <div class="panel-card">
+              <div class="panel-head">
+                <h2>Student Profile </h2>
+                <p>Enter the candidate's biographical details.</p>
+              </div>
+
+              <h3 class="subhead">Candidate Details <span class="subhead-hint">&mdash; students table</span></h3>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label" for="studentName">Full Name<span class="req">*</span></label>
+                  <input type="text" class="form-control" id="studentName" placeholder="As per College ID" required>
+                  <div class="invalid-feedback">Please enter the candidate's full name.</div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" for="fathersName">Father's Name<span class="req">*</span></label>
+                  <input type="text" class="form-control" id="fathersName" placeholder="As per official records" required>
+                  <div class="invalid-feedback">Please enter the father's name.</div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label" for="gender">Gender<span class="req">*</span></label>
+                  <select class="form-select" id="gender" required>
+                    <option value="">Select one</option>
+                    <option>Male</option>
+                    <option>Female</option>
+                    <option>Other</option>
+                  </select>
+                  <div class="invalid-feedback">Please select a gender.</div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label" for="dob">Date of Birth</label>
+                  <input type="date" class="form-control" id="dob">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label" for="studentPhone">Mobile Number<span class="req">*</span></label>
+                  <input type="tel" class="form-control" id="studentPhone" placeholder="10-digit mobile number" pattern="[0-9]{10}" required>
+                  <div class="invalid-feedback">Please enter a valid 10-digit mobile number.</div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" for="studentEmail">Personal Email ID<span class="req">*</span></label>
+                  <input type="email" class="form-control" id="studentEmail" placeholder="candidate@example.com" required>
+                  <div class="invalid-feedback">Please enter a valid email address.</div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" for="permanentAddress">Permanent Address</label>
+                  <input type="text" class="form-control" id="permanentAddress" placeholder="Street, City, State, PIN">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" for="emergencyName">Emergency Contact Name</label>
+                  <input type="text" class="form-control" id="emergencyName" placeholder="Parent / Guardian name">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" for="emergencyMobile">Emergency Contact Mobile</label>
+                  <input type="tel" class="form-control" id="emergencyMobile" placeholder="10-digit mobile number" pattern="[0-9]{10}">
+                </div>
+              </div>
+              </section>
+
+              <section class="wizard-panel d-none" id="panel-2" data-panel="2">
+            <div class="panel-card">
+              <div class="panel-head">
+                <h2>Academic Details</h2>
+              </div>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label" for="universityName">University / Board<span class="req">*</span></label>
+                  <input type="text" class="form-control" id="universityName" placeholder="e.g., Guru Gobind Singh Indraprastha University" required>
+                  <div class="invalid-feedback">Please enter the university/board name.</div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" for="collegeName">College / Institute<span class="req">*</span></label>
+                  <input type="text" class="form-control" id="collegeName" placeholder="e.g., Delhi Technological University" required>
+                  <div class="invalid-feedback">Please enter the college/institute name.</div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label" for="degreeProgram">Degree Program<span class="req">*</span></label>
+                  <select class="form-select" id="degreeProgram" required>
+                    <option value="">Select one</option>
+                    <option>B.Tech</option>
+                    <option>B.E.</option>
+                    <option>Diploma</option>
+                    <option>M.Tech</option>
+                    <option>Other</option>
+                  </select>
+                  <div class="invalid-feedback">Please select a degree program.</div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label" for="branchName">Branch<span class="req">*</span></label>
+                  <input type="text" class="form-control" id="branchName" placeholder="e.g., Electronics &amp; Comm." required>
+                  <div class="invalid-feedback">Please enter the branch.</div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label" for="currentSemester">Current Semester<span class="req">*</span></label>
+                  <select class="form-select" id="currentSemester" required>
+                    <option value="">Select one</option>
+                    <option value="1">1</option><option value="2">2</option>
+                    <option value="3">3</option><option value="4">4</option>
+                    <option value="5">5</option><option value="6">6</option>
+                    <option value="7">7</option><option value="8">8</option>
+                  </select>
+                  <div class="invalid-feedback">Please select the current semester.</div>
+                </div>
+              </div>
+
+              <hr class="section-divider">
+              <h3 class="subhead">Academic Transcript Ledger</h3>
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label class="form-label" for="pct10">10th Standard %</label>
+                  <div class="input-group">
+                    <input type="number" class="form-control" id="pct10" min="0" max="100" step="0.01" placeholder="e.g., 92.4">
+                    <span class="input-group-text">%</span>
+                  </div>
+                  <div class="invalid-feedback">Enter a value between 0 and 100.</div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label" for="pct12">12th Standard %</label>
+                  <div class="input-group">
+                    <input type="number" class="form-control" id="pct12" min="0" max="100" step="0.01" placeholder="e.g., 89.0">
+                    <span class="input-group-text">%</span>
+                  </div>
+                  <div class="invalid-feedback">Enter a value between 0 and 100.</div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label" for="cgpa">Current CGPA<span class="req">*</span></label>
+                  <input type="number" class="form-control" id="cgpa" min="0" max="10" step="0.01" placeholder="e.g., 8.2" required>
+                  <div class="invalid-feedback">Enter the current CGPA.</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ========== STEP 2: CLOUD ASSET UPLOADS ==========
+               These five slots are exactly the `document_types` rows
+               seeded with is_mandatory = TRUE and is_system_generated
+               = FALSE (i.e. applicant-facing at referral time).
+               'Mentor's Evaluation' is also mandatory in the schema
+               but is collected after the internship starts, so it's
+               intentionally left out of this step. 'Offer Letter',
+               'Completion Certificate' and 'Completion Letter' are
+               is_system_generated = TRUE (produced by HR later),
+               so they never appear as an upload control either. -->
+          <section class="wizard-panel d-none" id="panel-3" data-panel="3">
+            <div class="panel-card">
+              <div class="panel-head">
+                <h2>Cloud Asset Uploads</h2>
+                <p>All five documents are mandatory. Max size 5MB each &middot; PDF, JPG or PNG only.</p>
+              </div>
+
+              <div class="row g-3" id="uploadGrid">
+                <!-- Each dropzone is identical in structure; data-doc-type drives
+                     the renamed-filename pattern in script.js and should match
+                     document_types.type_name (slugified) for a clean backend hookup -->
+                <div class="col-md-6">
+                  <div class="dropzone" data-doc-type="passport_photo">
+                    <input type="file" class="dz-input" id="file_passport_photo" accept=".jpg,.jpeg,.png" hidden>
+                    <label for="file_passport_photo" class="dz-label">
+                      <i class="bi bi-image dz-icon"></i>
+                      <div class="dz-title">Passport Photo</div>
+                      <div class="dz-hint">Click or drag file here</div>
+                    </label>
+                    <div class="dz-status" data-status-for="passport_photo"></div>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="dropzone" data-doc-type="signature">
+                    <input type="file" class="dz-input" id="file_signature" accept=".jpg,.jpeg,.png,.pdf" hidden>
+                    <label for="file_signature" class="dz-label">
+                      <i class="bi bi-pen dz-icon"></i>
+                      <div class="dz-title">Signature</div>
+                      <div class="dz-hint">Click or drag file here</div>
+                    </label>
+                    <div class="dz-status" data-status-for="signature"></div>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="dropzone" data-doc-type="aadhar_card">
+                    <input type="file" class="dz-input" id="file_aadhar_card" accept=".pdf,.jpg,.jpeg,.png" hidden>
+                    <label for="file_aadhar_card" class="dz-label">
+                      <i class="bi bi-credit-card-2-front dz-icon"></i>
+                      <div class="dz-title">AADHAR Card</div>
+                      <div class="dz-hint">Click or drag file here</div>
+                    </label>
+                    <div class="dz-status" data-status-for="aadhar_card"></div>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="dropzone" data-doc-type="college_id">
+                    <input type="file" class="dz-input" id="file_college_id" accept=".pdf,.jpg,.jpeg,.png" hidden>
+                    <label for="file_college_id" class="dz-label">
+                      <i class="bi bi-person-vcard dz-icon"></i>
+                      <div class="dz-title">College ID</div>
+                      <div class="dz-hint">Click or drag file here</div>
+                    </label>
+                    <div class="dz-status" data-status-for="college_id"></div>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="dropzone" data-doc-type="letter_of_recommendation">
+                    <input type="file" class="dz-input" id="file_lor" accept=".pdf,.jpg,.jpeg,.png" hidden>
+                    <label for="file_lor" class="dz-label">
+                      <i class="bi bi-file-earmark-text dz-icon"></i>
+                      <div class="dz-title">Letter of Recommendation</div>
+                      <div class="dz-hint">Click or drag file here</div>
+                    </label>
+                    <div class="dz-status" data-status-for="letter_of_recommendation"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ========== STEP 3: OPERATIONAL DIRECTIVES & DEPARTMENT ALLOCATION ========== -->
+          <section class="wizard-panel d-none" id="panel-4" data-panel="4">
+            <div class="panel-card">
+              <div class="panel-head">
+                <h2>Placement Directives</h2>
+                <p>Configure the technical parameters of the internship.</p>
+              </div>
+
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <!-- Options match the `departments` table seed rows exactly -->
+                  <label class="form-label" for="department">Target Department<span class="req">*</span></label>
+                  <select class="form-select" id="department" required>
+                    <option value="">Select department</option>
+                    <option value="Civil">Civil</option>
+                    <option value="Mechanical/RS">Mechanical/RS</option>
+                    <option value="Electrical">Electrical</option>
+                    <option value="IT">IT</option>
+                    <option value="S&T">S&amp;T</option>
+                    <option value="Finance">Finance</option>
+                    <option value="HR">HR</option>
+                    <option value="Legal">Legal</option>
+                  </select>
+                  <!-- Live capacity readout, populated via mock AJAX call -->
+                  <div class="capacity-readout" id="capacityReadout"></div>
+                </div>
+
+                <div class="col-md-3">
+                  <label class="form-label" for="session">Session<span class="req">*</span></label>
+                  <select class="form-select" id="session" required>
+                    <option value="">Select</option>
+                    <option value="Summer">Summer</option>
+                    <option value="Winter">Winter</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <!-- internship_cycles.application_year -- only 2026 is
+                       seeded right now, but this stays a select so future
+                       cycles can be added without changing the markup shape -->
+                  <label class="form-label" for="applicationYear">Application Year<span class="req">*</span></label>
+                  <select class="form-select" id="applicationYear" required>
+                    <option value="">Select</option>
+                    <option value="2026">2026</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label" for="duration">Duration (weeks)<span class="req">*</span></label>
+                  <input type="number" class="form-control" id="duration" min="1" max="26" value="4" required>
+                  <!-- applications.duration_weeks defaults to 4 in the schema -->
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label" for="doj">Planned Date of Joining<span class="req">*</span></label>
+                  <input type="date" class="form-control" id="doj" required>
+                </div>
+
+                <div class="col-md-6 d-flex align-items-end">
+                  <div class="form-check form-switch ward-switch">
+                    <input class="form-check-input" type="checkbox" id="wardCheckbox">
+                    <label class="form-check-label" for="wardCheckbox">
+                      Applicant is a <strong>Ward</strong> (child of a DMRC employee)
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Waitlist / capacity caution banner - shown/hidden entirely by JS
+                   business logic mirroring Section 4.1 of the blueprint -->
+              <div class="alert-banner d-none" id="waitlistBanner" role="alert">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <span>Current capacity for this department is full. This application will be placed in the waitlist pool and reviewed subject to slot availability.</span>
+              </div>
+            </div>
+          </section>
+
+          <!-- ========== STEP 5: LEGAL DECLARATIONS & SUBMISSION GATE ========== -->
+          <section class="wizard-panel d-none" id="panel-5" data-panel="5">
+            <div class="panel-card">
+              <div class="panel-head">
+                <h2>Review &amp; Submit</h2>
+                <p>Confirm the details below, then complete the legal declarations to submit.</p>
+              </div>
+
+              <!-- Read-only summary, filled dynamically from wizard state -->
+              <div class="summary-grid" id="summaryGrid"></div>
+
+              <hr class="section-divider">
+              <h3 class="subhead">Legal Declarations</h3>
+
+              <div class="form-check declaration-check">
+                <input class="form-check-input" type="checkbox" id="declare1" required>
+                <label class="form-check-label" for="declare1">
+                  I confirm the candidate is a full-time student at the institution named above for the duration of this internship.
+                </label>
+              </div>
+              <div class="form-check declaration-check">
+                <input class="form-check-input" type="checkbox" id="declare2" required>
+                <label class="form-check-label" for="declare2">
+                  I confirm the candidate agrees to comply with all applicable DMRC rules, codes of conduct, and safety policies.
+                </label>
+              </div>
+              <div class="form-check declaration-check">
+                <input class="form-check-input" type="checkbox" id="declare3" required>
+                <label class="form-check-label" for="declare3">
+                  I declare that all information and documents submitted in this application are true and accurate to the best of my knowledge.
+                </label>
+              </div>
+            </div>
+          </section>
+
+        </form>
+      </div>
+      <!-- ---------------- END LEFT COLUMN ---------------- -->
+
+      <!-- ---------------- RIGHT: TICKET STUB (signature element) ---------------- -->
+      <div class="col-lg-4">
+        <aside class="ticket-stub sticky-top" id="ticketStub">
+          <div class="ticket-top">
+            <div class="ticket-eyebrow">Application Ticket</div>
+            <div class="ticket-code" id="ticketCode">DRAFT &middot; NOT ISSUED</div>
+          </div>
+
+          <div class="ticket-perforation" aria-hidden="true"></div>
+
+          <div class="ticket-body">
+            <dl class="ticket-fact">
+              <dt>Candidate</dt>
+              <dd id="ticketName">&mdash;</dd>
+            </dl>
+            <dl class="ticket-fact">
+              <dt>College</dt>
+              <dd id="ticketCollege">&mdash;</dd>
+            </dl>
+            <dl class="ticket-fact">
+              <dt>Department</dt>
+              <dd id="ticketDept">&mdash;</dd>
+            </dl>
+            <dl class="ticket-fact">
+              <dt>Session</dt>
+              <dd id="ticketSession">&mdash;</dd>
+            </dl>
+            <dl class="ticket-fact">
+              <dt>Date of Joining</dt>
+              <dd id="ticketDoj">&mdash;</dd>
+            </dl>
+
+            <div class="ticket-status">
+              <span class="status-pill status-draft" id="ticketStatusPill">Draft</span>
+            </div>
+          </div>
+
+          <div class="ticket-perforation" aria-hidden="true"></div>
+
+          <div class="ticket-footer">
+            <i class="bi bi-shield-check"></i>
+            <span>Autosaved as draft &middot; <span id="lastSavedAt">not saved yet</span></span>
+          </div>
+        </aside>
+      </div>
+      <!-- ---------------- END RIGHT COLUMN ---------------- -->
+
+    </div>
+
+    <!-- ============================================================
+         WIZARD ACTION BAR
+         Buttons map 1:1 to Section 2's "Wizard Button Controls":
+         Save Draft / Save & Next / Save & Back / Preview & Submit
+    ============================================================= -->
+    <div class="wizard-actions">
+      <button type="button" class="btn btn-outline-secondary" id="btnSaveDraft">
+        <i class="bi bi-cloud-arrow-up"></i> Save Draft
+      </button>
+      <div class="ms-auto d-flex gap-2">
+        <button type="button" class="btn btn-outline-primary d-none" id="btnBack">
+          <i class="bi bi-arrow-left"></i> Save &amp; Back
+        </button>
+        <button type="button" class="btn btn-primary" id="btnNext">
+          Save &amp; Next <i class="bi bi-arrow-right"></i>
+        </button>
+        <button type="button" class="btn btn-success d-none" id="btnSubmit">
+          <i class="bi bi-check2-circle"></i> Preview &amp; Submit
+        </button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ============================================================
+     TOAST CONTAINER
+     Used for lightweight feedback on every Ajax call (save
+     success, save failure, validation errors, etc.)
+============================================================= -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastContainer"></div>
+
+<!-- ============================================================
+     SUBMISSION SUCCESS MODAL
+     Shown after the final "Preview & Submit" Ajax call resolves.
+============================================================= -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body text-center py-4">
+        <div class="success-check"><i class="bi bi-check-lg"></i></div>
+        <h4 class="mt-3">Application Submitted</h4>
+        <p class="text-secondary mb-1">This record is now visible to HR for review.</p>
+        <p class="mb-0">Ticket Code</p>
+        <div class="final-ticket-code" id="finalTicketCode">&mdash;</div>
+      </div>
+      <div class="modal-footer justify-content-center border-0 pb-4">
+        <button type="button" class="btn btn-primary px-4" data-bs-dismiss="modal">Done</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap 5 bundle (includes Popper) - needed for modal/toast JS behavior -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
